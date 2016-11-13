@@ -67,6 +67,10 @@ class Tree:
 
         self.root = newRoot
 
+    def __iter__(self):
+        nodes = []
+        self.traverse(lambda n: nodes.append(n))
+        return nodes
 
     def __init__(self, aInput=None):
         self.root = Node(aId='root')
