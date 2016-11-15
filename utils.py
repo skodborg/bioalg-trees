@@ -39,28 +39,17 @@ class Tree:
             temp_parent.remove_child(child)
             child.add_child(temp_parent)
 
-
         def traverse_down(node):
             # cache before reverse_relations (mutates children list for node)
             cached_node_children = node.children
 
-            # make node.parent a child of node, and change parent 
+            # make node.parent a child of node, and change parent
             # of node.parent to node
             reverse_relations(node)
 
             for c in cached_node_children:
                 traverse_down(c)
 
-
-
-
-        def traverse_up(node, root):
-            siblings = [c for c in node.parent.children if c != node]
-
-
-
-
-            
         path = list(reversed(find_path(newRoot)))
         for c in path:
             reverse_relations(c)
@@ -79,6 +68,7 @@ class Tree:
     def __str__(self):
         return self.root.fancyprint()
 
+
 class Node:
     _ids = count(0)
 
@@ -95,7 +85,7 @@ class Node:
 
     def fancyprint(self, level=0):
         self_id = self.id if self.id else 'no-id'
-        result = '\t'*level + self_id + '\n'
+        result = '\t' * level + self_id + '\n'
         for child in self.children:
             result += child.fancyprint(level + 1)
         return result
@@ -130,4 +120,3 @@ class Node:
     def __repr__(self):
         self_id = self.id if self.id else 'no-id'
         return self_id
-        
