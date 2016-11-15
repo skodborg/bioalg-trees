@@ -1,6 +1,8 @@
 import argparse
 import newick_parser as nwk
 import utils
+import time
+import copy
 
 
 def rfdist(tree1, tree2):
@@ -106,8 +108,37 @@ def rfdist(tree1, tree2):
     shared_splits = list(set(t1_splits).intersection(set(t2_splits)))
 
     rfdist = len(set(t1_splits)) + len(set(t2_splits)) - 2 * len(shared_splits)
-    print(rfdist)
     return rfdist
+
+
+def rfdist_running_time_test():
+    def swap_leaves(tree):
+        leaflist = tree.root.leaflist()
+        templeaf_id = leaflist[0].id
+        leaflist[0].id = leaflist[1].id
+        leaflist[1].id = templeaf_id
+        # print('swapped %s and %s' % (leaflist[0].id, leaflist[1].id))
+    iterations = 3
+    for n in range(100, 10000, 100):
+        result = 0
+        print('n: %i' % n)
+        for _ in range(iterations):
+            t1 = utils.generate_random_tree(n)
+            t2 = copy.deepcopy(t1)
+
+            swap_leaves(t2)
+            commonRoot = t1.root.leaflist()[0]
+            t1.reroot(commonRoot)
+            for node in t2.root.leaflist():
+                if node.id == commonRoot.id:
+                    t2.reroot(node)
+                    break
+            start = time.time()
+            rfdist(t1, t2)
+            stop = time.time()
+            result += (stop - start)
+        avg = result / 3
+        print('avg: %s' % str(avg))
 
 
 def main():
@@ -123,8 +154,9 @@ def main():
     tree1 = nwk.parse_newicktree(args.tree1)
     tree2 = nwk.parse_newicktree(args.tree2)
 
-    rfdist(tree1, tree2)
-
+    print(rfdist(tree1, tree2))
+    
+    # rfdist_running_time_test()
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,5 @@
 from itertools import count
+import random as rnd
 
 
 class Tree:
@@ -55,11 +56,6 @@ class Tree:
             reverse_relations(c)
 
         self.root = newRoot
-
-    def __iter__(self):
-        nodes = []
-        self.traverse(lambda n: nodes.append(n))
-        return nodes
 
     def __init__(self, aInput=None):
         self.root = Node(aId='root')
@@ -120,3 +116,15 @@ class Node:
     def __repr__(self):
         self_id = self.id if self.id else 'no-id'
         return self_id
+
+
+def generate_random_tree(n, forced_leaf_id=None):
+    tree = Tree()
+    root = tree.root
+    nodes_list = [root]
+    for i in range(n):
+        newNode = Node(aId=str(i))
+        rnd.choice(nodes_list).add_child(newNode)
+        if not i == forced_leaf_id:
+            nodes_list.append(newNode)
+    return tree
