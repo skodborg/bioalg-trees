@@ -106,7 +106,7 @@ def rfdist(tree1, tree2):
     shared_splits = list(set(t1_splits).intersection(set(t2_splits)))
 
     rfdist = len(set(t1_splits)) + len(set(t2_splits)) - 2 * len(shared_splits)
-    print(rfdist)
+
     return rfdist
 
 
