@@ -1,6 +1,9 @@
 import argparse
 import newick_parser as nwk
 import utils
+import time
+import copy
+import random as rnd
 
 
 def rfdist(tree1, tree2):
@@ -110,6 +113,77 @@ def rfdist(tree1, tree2):
     return rfdist
 
 
+def rfdist_correctness_test():
+    t1 = nwk.parse_newicktree('tree1.new')
+    # deep copy of the original tree, to mutate and compare to original
+    t1_copy = copy.deepcopy(t1)
+
+    # reroot the tree a number of times with a random choice of new root
+    initialroot = t1_copy.root
+    leaflist = t1_copy.root.leaflist()
+    rerootings = 3
+    for _ in range(rerootings):
+        rndroot = rnd.choice(leaflist)
+        while rndroot.id == t1_copy.root.id:
+            # resampling, we want a new root!
+            rndroot = rnd.choice(leaflist)
+        print('rerooting with %s' % rndroot)
+        t1_copy.reroot(rndroot)
+    # reroot the tree with the original root, for comparison with original t1
+    t1_copy.reroot(initialroot)
+    
+    # compare the two trees;
+    # should be identical trees despite the numerous rerootings
+    t1_nodes = []
+    t1_copy_nodes = []
+    t1.dfs(lambda n: t1_nodes.append(n))
+    t1_copy.dfs(lambda n: t1_copy_nodes.append(n))
+    identical = True
+    for n_t1 in t1_nodes:
+        n_t1_copy = [n for n in t1_copy_nodes if n.id == n_t1.id]
+        if not n_t1_copy:
+            identical = False
+            break
+        if n_t1_copy[0].parent:
+            if not (n_t1_copy and n_t1_copy[0].parent.id == n_t1.parent.id):
+                identical = False
+                break
+    if identical:
+        print('trees matched!')
+    else:
+        print('error: trees did not match')
+
+
+def rfdist_running_time_test():
+    def swap_leaves(tree):
+        leaflist = tree.root.leaflist()
+        templeaf_id = leaflist[0].id
+        leaflist[0].id = leaflist[1].id
+        leaflist[1].id = templeaf_id
+        # print('swapped %s and %s' % (leaflist[0].id, leaflist[1].id))
+    iterations = 3
+    for n in range(100, 10000, 100):
+        result = 0
+        print('n: %i' % n)
+        for _ in range(iterations):
+            t1 = utils.generate_random_tree(n)
+            t2 = copy.deepcopy(t1)
+
+            swap_leaves(t2)
+            commonRoot = t1.root.leaflist()[0]
+            t1.reroot(commonRoot)
+            for node in t2.root.leaflist():
+                if node.id == commonRoot.id:
+                    t2.reroot(node)
+                    break
+            start = time.time()
+            rfdist(t1, t2)
+            stop = time.time()
+            result += (stop - start)
+        avg = result / 3
+        print('avg: %s' % str(avg))
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -123,8 +197,9 @@ def main():
     tree1 = nwk.parse_newicktree(args.tree1)
     tree2 = nwk.parse_newicktree(args.tree2)
 
-    rfdist(tree1, tree2)
-
+    print(rfdist(tree1, tree2))
+    # rfdist_running_time_test()
+    # rfdist_correctness_test()
 
 if __name__ == '__main__':
     main()
