@@ -81,6 +81,8 @@ class Node:
 
     def fancyprint(self, level=0):
         self_id = self.id if self.id else 'no-id'
+        if self.parentEdge:
+            self_id += ':%.2f' % self.parentEdge
         result = '\t' * level + self_id + '\n'
         for child in self.children:
             result += child.fancyprint(level + 1)
