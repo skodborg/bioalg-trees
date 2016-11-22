@@ -18,11 +18,12 @@ def parseDistMatrix(phylibfile):
         mDist.append(mDist_row)
     return mDist, name2idx
 
+
 def nj(phylibfile):
     # -------- initialization --------
     mDist, name2idx = parseDistMatrix(phylibfile)
     k_count = 1
-    
+
     # step 1:
     S = []
 
@@ -32,7 +33,7 @@ def nj(phylibfile):
         newnode = utils.Node(aId=s)
         S.append(newnode)
         T.root.add_child(newnode)
-    
+
     # -------- algorithm loop --------
     while len(S) > 3:
         # step 1:
@@ -47,16 +48,13 @@ def nj(phylibfile):
                 rj = 1 / (len(S) - 2) * sum(mDist[j])
                 n_ij = d_ij - (ri + rj)
                 N[i][j] = n_ij
+
         #   (b)
-        # N = np.array(N, int)
         N = np.array(N)
         # we want the min dist between two distinct nodes, diagonal is inf
-        # TODO: is this true?? or is the loops above and their resulting N wrong?
-        np.fill_diagonal(N, float('inf'))  
-        # print(N)
+        np.fill_diagonal(N, float('inf'))
         min_n_ij = np.argmin(N)
         min_i, min_j = divmod(min_n_ij, len(S))
-        # print((min_i, min_j))
 
         # step 2:
         k = utils.Node(aId='k%i' % k_count)
@@ -81,24 +79,16 @@ def nj(phylibfile):
         k.add_child(sj)
         si.parentEdge = gamma_ki
         sj.parentEdge = gamma_kj
-        
-        # print(T)
 
         # step 4:
         # TODO: clean up code, very ugly
         temp_S = [s for s in S if s not in [k, si, sj]]
-        # print('temp_S')
-        # print(temp_S)
-        # print('name2idx: %s' % str(name2idx))
         d_km = [None for _ in range(len(S))]
         for m in temp_S:
             m_idx = name2idx[m.id]
-            d_im = mDist[i][m_idx]
-            d_jm = mDist[j][m_idx]
+            d_im = mDist[min_i][m_idx]
+            d_jm = mDist[min_j][m_idx]
             d_km[m_idx] = (d_im + d_jm - d_ij) / 2
-            # print(m)
-            # print(name2idx[m.id])
-        # print(d_km)
 
         # delete row i and j
         for idx in sorted([min_i, min_j], reverse=True):
@@ -114,15 +104,13 @@ def nj(phylibfile):
             mDist[idx].append(d_km[idx])  # col extension
         d_km.append(0.0)
         mDist.append(d_km)  # row extension
-        # print(np.array(mDist))
-
 
         # step 5:
         S = [s for s in S if s.id not in [si.id, sj.id]]
-        
+
         name2idx = {name: idx for name, idx in name2idx.items()
                     if idx not in [min_i, min_j]}
-        
+
         for key, value in name2idx.items():
             gt_i = gt_j = False
             if value > min_i:
@@ -137,16 +125,9 @@ def nj(phylibfile):
         name2idx[k.id] = len(name2idx)
         S.append(k)
 
-        # print('S: %s' % str(S))
-
-    # print('ended loop')
-    # print(S)
-
-
-
     # --------- termination ----------
     i, j, m = S
-    # v = utils.Node(aId='v')
+    # use root as the node 'v' in pseudo code
     idx_i = name2idx[i.id]
     idx_j = name2idx[j.id]
     idx_m = name2idx[m.id]
@@ -162,8 +143,8 @@ def nj(phylibfile):
     j.parentEdge = vj
     m.parentEdge = vm
     print(T)
+    return T
 
-    
 
 def main():
     parser = argparse.ArgumentParser()
