@@ -57,6 +57,9 @@ class Tree:
 
         self.root = newRoot
 
+    def as_newick(self):
+        return '%s;' % self.root.as_newick()
+
     def __init__(self, aInput=None):
         self.root = Node(aId='root')
         self.input = aInput
@@ -86,6 +89,22 @@ class Node:
         result = '\t' * level + self_id + '\n'
         for child in self.children:
             result += child.fancyprint(level + 1)
+        return result
+
+    def as_newick(self):
+        result = ''
+        if self.children:
+            # inner
+            result += '('
+            for c in self.children:
+                result += c.as_newick() + ', '
+            result = result[:-2] + ')'
+        else:
+            # leaf
+            result += self.id
+        if self.parentEdge:
+            result += ':%f' % self.parentEdge
+
         return result
 
     def leaflist(self):
