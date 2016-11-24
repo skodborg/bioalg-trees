@@ -5,7 +5,8 @@ import time
 def runQuick():
 
 
-	folder = '/Users/simonfischer/Documents/bioinformatik/biotree/bioalg-trees/unique_distance_matrices'
+	# Absolute paths beacuse we are using the cmd to execute quick
+	folder = '/Users/simonfischer/Documents/bioinformatik/biotree/bioalg-trees/project2/distance_matrices'
 	folderForQuick = 'quick'
 	cmdForQuick = '/Users/simonfischer/Downloads/quicktree_1.1/bin/quicktree'
 	names = ""
@@ -32,7 +33,9 @@ def runQuick():
 	print(elapsedTime)
 
 def runRapidNJ():
-	folder = '/Users/simonfischer/Documents/bioinformatik/biotree/bioalg-trees/unique_distance_matrices'
+
+	# Absolute paths beacuse we are using the cmd to execute rapid
+	folder = '/Users/simonfischer/Documents/bioinformatik/biotree/bioalg-trees/project2/distance_matrices'
 	folderForRapid = '/Users/simonfischer/Documents/bioinformatik/biotree/bioalg-trees/project2/rapid/'
 	cmdForRapid = '/Users/simonfischer/Downloads/bin-2.3.2/mac_64/rapidnj'
 	names = ""
