@@ -1,3 +1,4 @@
+import argparse
 from Bio import Phylo
 import utils
 
@@ -27,3 +28,22 @@ def parse_newicktree(treefile):
                 # TODO: add c.branch_length to parentEdge
 
     return mytree
+
+
+def draw_newicktree(treefile):
+    tree = Phylo.read(treefile, 'newick')
+    Phylo.draw_ascii(tree)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    help_mDist = "Name of file containing newick tree to draw"
+    parser.add_argument('newicktreefile', help=help_mDist)
+
+    args = parser.parse_args()
+
+    draw_newicktree(args.newicktreefile)
+
+if __name__ == '__main__':
+    main()
