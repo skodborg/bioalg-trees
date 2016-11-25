@@ -19,10 +19,16 @@ def process_distance_matrices(path_to_distancematrices):
         start = time.time()
         resulttree = nj(path_to_distancematrices + fname)
         end = time.time()
+        
         f = open(outputdir + fname[:-4] + '.new', 'w')
         f.write(resulttree.as_newick())
         f.close()
         runtime = end - start
+
+        f2 = open('%srun_%s.txt' % (outputdir, fname), 'w')
+        f2.write('%s:%s' % (fname, runtime))
+        f2.close()
+        
         runningtimes.append((fname, runtime))
         print('finished %s in time %f\n\n' % (fname, runtime))
 
@@ -69,6 +75,14 @@ def nj(phylibfile, outputfile=None):
         print(len(S))
         # step 1:
         #   (a)
+        # TODO: can the sum of row i,j in mDist, ri and rj, be cached and updated, 
+        #       rather than recalculated every time we modify it?
+        #       We know the previous entries, and we know the values of the columns
+        #       we are removing, and we know the old and new length of S
+        #       do we have to sum the whole row again, or could we reuse the sum and modify?
+
+        # newSum = oldSum - (1/(old|S| - 2) * each-of-removed-col-i/jth-entries) + 1/(new|S| - 2) * addedEntry
+
         N = np.array([[None for _ in range(len(S))] for _ in range(len(S))])
         # N = [[None for _ in range(len(S))] for _ in range(len(S))]
         for si in S:
