@@ -72,31 +72,17 @@ def nj(phylibfile, outputfile=None):
 
     # -------- algorithm loop --------
     while len(S) > 3:
-        print(len(S))
-        # step 1:
-        #   (a)
-        # TODO: can the sum of row i,j in mDist, ri and rj, be cached and updated, 
-        #       rather than recalculated every time we modify it?
-        #       We know the previous entries, and we know the values of the columns
-        #       we are removing, and we know the old and new length of S
-        #       do we have to sum the whole row again, or could we reuse the sum and modify?
-
-        # newSum = oldSum - (1/(old|S| - 2) * each-of-removed-col-i/jth-entries) + 1/(new|S| - 2) * addedEntry
-
         N = np.array([[None for _ in range(len(S))] for _ in range(len(S))])
-        # N = [[None for _ in range(len(S))] for _ in range(len(S))]
         for si in S:
             i = name2idx[si.id]
             ri = 1 / (len(S) - 2) * np.sum(mDist[i])
-            # ri = 1 / (len(S) - 2) * sum(mDist[i])
             for sj in S:
                 j = name2idx[sj.id]
                 d_ij = mDist[i][j]
                 rj = 1 / (len(S) - 2) * np.sum(mDist[j])
-                # rj = 1 / (len(S) - 2) * sum(mDist[j])
                 n_ij = d_ij - (ri + rj)
                 N[i][j] = n_ij
-        
+
         #   (b)
         # we want the min dist between two distinct nodes, diagonal is inf
         np.fill_diagonal(N, float('inf'))
@@ -115,8 +101,8 @@ def nj(phylibfile, outputfile=None):
         si = [n for n in S if n.id == si_name][0]
         sj = [n for n in S if n.id == sj_name][0]
         d_ij = mDist[min_i][min_j]
-        ri = 1 / (len(S) - 2) * sum(mDist[min_i])
-        rj = 1 / (len(S) - 2) * sum(mDist[min_j])
+        ri = 1 / (len(S) - 2) * np.sum(mDist[min_i])
+        rj = 1 / (len(S) - 2) * np.sum(mDist[min_j])
         gamma_ki = (d_ij + ri - rj) / 2
         gamma_kj = d_ij - gamma_ki
         # assert(gamma_kj == (d_ij + rj - ri) / 2)
@@ -140,26 +126,18 @@ def nj(phylibfile, outputfile=None):
         # delete row i and j
         for idx in sorted([min_i, min_j], reverse=True):
             mDist = np.delete(mDist, idx, axis=0)
-            # del mDist[idx]
 
         # delete col i and j
         for idx in sorted([min_i, min_j], reverse=True):
-            # mDist = [[x for i, x in enumerate(mDist[j]) if i != idx] for j, ll in enumerate(mDist)]
             mDist = np.delete(mDist, idx, axis=1)
             del d_km[idx]
 
         # append d_km as row and col to the end of mDist, extending its dim by 1x1
-        # for idx in range(len(mDist)):
-        #     mDist[idx].append(d_km[idx])  # col extension
         numpy_d_km = np.array([d_km])
         mDist = np.concatenate((mDist, numpy_d_km.T), axis=1)
         d_km.append(0.0)
-        # print(np.array([d_km]).shape)
-        # print(mDist.shape)
         mDist = np.concatenate((mDist, np.array([d_km])), axis=0)
-        # mDist.append(d_km)  # row extension
         
-
         # step 5:
         S = [s for s in S if s.id not in [si.id, sj.id]]
 
@@ -180,7 +158,6 @@ def nj(phylibfile, outputfile=None):
         name2idx[k.id] = len(name2idx)
         S.append(k)
 
-
     # --------- termination ----------
     i, j, m = S
     # use root as the node 'v' in pseudo code
@@ -198,8 +175,8 @@ def nj(phylibfile, outputfile=None):
     i.parentEdge = vi
     j.parentEdge = vj
     m.parentEdge = vm
-    
-    # print(T)
+
+    print(T)
     return T
 
 
@@ -212,7 +189,7 @@ def main():
     args = parser.parse_args()
 
     nj(args.distancematrix)
-
+    
     # path_to_distancematrices = './distance_matrices/'
     # process_distance_matrices(path_to_distancematrices)
 
