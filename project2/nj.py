@@ -181,7 +181,7 @@ def nj(phylibfile, outputfile=None):
     j.parentEdge = vj
     m.parentEdge = vm
 
-    print(T)
+    # print(T)
     return T
 
 
@@ -336,7 +336,7 @@ def nj_opt(phylibfile, outputfile=None):
     j.parentEdge = vj
     m.parentEdge = vm
 
-    print(T)
+    # print(T)
     return T
 
 

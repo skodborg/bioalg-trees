@@ -1,0 +1,14 @@
+1347_FAINT.phy:1010.148008
+1493_Fe-ADH.phy:1381.678318
+1560_Ferritin.phy:1571.265909
+1689_FGGY_N.phy:1997.527358
+1756_FAD_binding_3.phy:2246.515009
+1849_FG-GAP.phy:2623.143338
+214_Arena_glycoprot.phy:3.795291
+304_A1_Propeptide.phy:11.061757
+401_DDE.phy:25.509092
+494_Astro_capsid.phy:48.017770
+608_Gemini_AL2.phy:89.911697
+777_Gemini_V1.phy:188.484136
+877_Glu_synthase.phy:274.840255
+89_Adeno_E3_CR1.phy:0.313552
