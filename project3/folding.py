@@ -18,7 +18,7 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
     # print(match_odd_even)
 
     max_matching = match_even_odd if len(match_even_odd) > len(match_odd_even) else match_odd_even
-    print(max_matching)
+    # print(max_matching)
 
     center_match = max_matching[-1]
     split_idx = center_match[0] + int((center_match[1] - center_match[0] - 1) / 2) + 1
@@ -35,7 +35,7 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
     fold += 's'
     fold += 'w' * (len(HPstr) - len(fold) - 1)
     
-    print_folding(HPstr, fold)
+    # print_folding(HPstr, fold)
 
     S1_fold = ''
     for i, m in enumerate(max_matching):
@@ -54,9 +54,6 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
     remainder = len(S1) - max_matching[-1][0] - 1
     S1_fold += 'e' * remainder
 
-    print(S1_fold)
-
-
 
     S2_fold = 'w' * remainder
     for i, m in enumerate(reversed(max_matching)):
@@ -66,9 +63,6 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
         else:
             prev_m = max_matching[len(max_matching) - i]
             ns_pairs = int((m[1] - prev_m[1]) / 2) - 1
-            print(m[1])
-            print(prev_m[1])
-            print(ns_pairs)
             S2_fold += 's' * ns_pairs
             S2_fold += 'w'
             S2_fold += 'n' * ns_pairs
@@ -76,14 +70,10 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
 
     remainder = len(HPstr) - max_matching[0][1] - 1
     S2_fold += 'w' * remainder
-    print(remainder * 'w')
-    print(len(HPstr))
 
-    print(S2_fold)
-    print(S1_fold + ',' + S2_fold)
-
+    
     final_fold = S1_fold + 's' + S2_fold
-    print(final_fold)
+    # print(final_fold)
 
     print_folding(HPstr, final_fold)
 
@@ -115,7 +105,7 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    fold_hp_string()
+    fold_hp_string('hhhhhhhhhhhhphphpphhpphhpphpphhpphhpphpphhpphhpphphphhhhhhhhhhhh')
 
 
 if __name__ == '__main__':
