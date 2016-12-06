@@ -1,0 +1,15 @@
+ 1: hhppppphhppphppphp -4
+ 2: hphphhhppphhhhpphh -8
+ 3: phpphphhhphhphhhhh -9
+ 4: hphpphhphpphphhpphph -9
+ 5: hhhpphphphpphphphpph -10
+ 6: hhpphpphpphpphpphpphpphh -9
+ 7: pphpphhpppphhpppphhpppphh -8
+ 8: ppphhpphhppppphhhhhhhpphhpppphhpphpp -14
+ 9: pphpphhpphhppppphhhhhhhhhhpppppphhpphhpphpphhhhh -23
+10: hhphphphphhhhphppphppphpppphppphppphphhhhphphphphh -21
+11: pphhhphhhhhhhhppphhhhhhhhhhphppphhhhhhhhhhhhpppphhhhhhphhphp -36
+12: hhhhhhhhhhhhphphpphhpphhpphpphhpphhpphpphhpphhpphphphhhhhhhhhhhh -42
+13: hhhhpppphhhhhhhhhhhhpppppphhhhhhhhhhhhppphhhhhhhhhhhhppphhhhhhhhhhhhppphpphhpphhpphph -53
+14: pppppphphhppppphhhphhhhhphhpppphhpphhphhhhhphhhhhhhhhhphhphhhhhhhppppppppppphhhhhhhpphphhhpppppphphh -48
+15: ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh -50
