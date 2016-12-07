@@ -19,6 +19,7 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
 
     max_matching = match_even_odd if len(match_even_odd) > len(match_odd_even) else match_odd_even
     # print(max_matching)
+    # max_matching = match_even_odd
 
     center_match = max_matching[-1]
     split_idx = center_match[0] + int((center_match[1] - center_match[0] - 1) / 2) + 1
@@ -105,7 +106,8 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    fold_hp_string('hhhhhhhhhhhhphphpphhpphhpphpphhpphhpphpphhpphhpphphphhhhhhhhhhhh')
+    # fold_hp_string('hhphphphphhhhphppphppphpppphppphppphphhhhphphphphh')
+    fold_hp_string('ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh')
 
 
 if __name__ == '__main__':
