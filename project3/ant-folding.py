@@ -12,8 +12,12 @@ def aco(S='hhppppphhppphppphp'):
     theta = 0.05
     steps = 100
     n = len(S)
+    # initialize pheromones to 1.0 for all i,d as they have no effect on the decision
+    # initially (no previous ants have walked, no pheromones has been left, nothing
+    # exists to follow yet) - update as we decide moves
     pheromones = [(1.0, 1.0, 1.0) for _ in range(n)]
     # m_pheromones = [None for _ in range(n)]
+    # heuristics format: (S)traight, (L)eft, (R)ight
     heuristics = [(1.0, 1.0, 1.0)]
     # m_heuristics = [None for _ in range(n)]
     d = {0: 'S', 1: 'L', 2: 'R'}
@@ -28,41 +32,81 @@ def aco(S='hhppppphhppphppphp'):
     # TODO: arbitrary positions instead of in the middle?
     lattice[n][n] = fst
     lattice[n][n+1] = snd
-    # print(np.array(lattice))
-    # print(lattice)
-
-    # h = []
-    # for i in range(n-1):
-    #     if S[i+1] == 'p':
-    #         h.append((0.0, 0.0, 0.0))
-        # else:
-
-
+    
     # for ant in range(ants):
     prevpos = (n, n)
     currpos = (n, n+1)
 
     for i in range(initpos, n-1):
-        print(i)
-        print(n, n)
-        print(lattice[n][n+1])
+        # print(i)
         pid = []
+
+        # heuristics format: [S, L, R]-triple
+        #                    (S)traight, (L)eft, (R)ight
+        heuristics_id = []
+
+        current_direction = None
+        if prevpos[0] > currpos[0]:
+            current_direction = 'north'
+        if prevpos[0] < currpos[0]:
+            current_direction = 'south'
+        if prevpos[1] > currpos[1]:
+            current_direction = 'west'
+        if prevpos[1] < currpos[1]:
+            current_direction = 'east'
+
+
         for d in range(3):
-            pheromone_id = pheromones[i][d]
+            if d == 0:  # Straight
+                straight = None
+                if current_direction == 'north':
+                    straight = checkNorth
+                elif current_direction == 'south':
+                    straight = checkSouth
+                elif current_direction == 'east':
+                    straight = checkEast
+                else: # current_direction == 'west'
+                    straight = checkWest
+                try:
+                    h_id = straight(currpos[0], currpos[1], lattice)
+                    heuristics_id.append(h_id)
+                except Exception as err:
+                    print('Exception: %s' % err)
+            elif d == 1:  # Left
+                left = None
+                if current_direction == 'north':
+                    left = checkWest
+                elif current_direction == 'south':
+                    left = checkEast
+                elif current_direction == 'east':
+                    left = checkNorth
+                else: # current_direction == 'west'
+                    left = checkSouth
+                try:
+                    h_id = left(currpos[0], currpos[1], lattice)
+                    heuristics_id.append(h_id)
+                except Exception as err:
+                    print('Exception: %s' % err)
+            else: # d == 2,  # Right
+                right = None
+                if current_direction == 'north':
+                    right = checkEast
+                elif current_direction == 'south':
+                    right = checkWest
+                elif current_direction == 'east':
+                    right = checkSouth
+                else: # current_direction == 'west'
+                    right = checkNorth
+                try:
+                    h_id = right(currpos[0], currpos[1], lattice)
+                    heuristics_id.append(h_id)
+                except Exception as err:
+                    print('Exception: %s' % err)
 
-            # heuristic_id = []
-            
-            # determine where we came from
+        heuristics_id = list(map(lambda x: x + 1, heuristics_id))
+        heuristics.append(heuristics_id)
 
-
-
-
-
-
-
-
-
-
+        for d in range(3):
             denom_sum = 0.0
             for e in range(3):
                 denom_sum += (pheromones[i][e] ** alpha) * (heuristics[i][e] ** beta)
@@ -70,21 +114,70 @@ def aco(S='hhppppphhppphppphp'):
             prob_id = numerator / denom_sum
             pid.append(prob_id)
 
-        print(pid)
+        # pick an element from {S, L, R} with probabilities as defined by pid
+        # directions: S:0, L:1, R:2
+        chosen_direction = np.random.choice(3, 1, p=pid)
 
         # update lattice with new position
+        newpos = [currpos[0], currpos[1]]
+        if current_direction == 'north':
+            if chosen_direction == 0:
+                # straight; corresponds to NORTH
+                newpos[0] -= 1
+            elif chosen_direction == 1:
+                # left; corresponds to WEST
+                newpos[1] -= 1
+            else: # chosen_direction == 2:
+                # right; corresponds to EAST
+                newpos[1] += 1
+        elif current_direction == 'south':
+            if chosen_direction == 0:
+                # straight; corresponds to SOUTH
+                newpos[0] += 1
+            elif chosen_direction == 1:
+                # left
+                newpos[1] += 1
+            else: # chosen_direction == 2:
+                # right
+                newpos[1] -= 1
+        elif current_direction == 'east':
+            if chosen_direction == 0:
+                # straight
+                newpos[1] += 1
+            elif chosen_direction == 1:
+                # left
+                newpos[0] -= 1
+            else: # chosen_direction == 2:
+                # right
+                newpos[0] += 1
+        else: # current_direction == 'west':
+            if chosen_direction == 0:
+                # straight
+                newpos[1] -= 1
+            elif chosen_direction == 1:
+                # left
+                newpos[0] += 1
+            else: # chosen_direction == 2:
+                # right
+                newpos[0] -= 1
+        lattice[newpos[0]][newpos[1]] = S[i]
 
-
-        # if i > 0:
-            # update pheromones?
+        # update cached positions to perform the move
+        prevpos = currpos
+        currpos = newpos
 
         # pheromone update:
+        # if no pheromone exists for this i (first ant traveling) then append?
         # T(i,d) = (1 - rho) * T(i,d) + delta(i,d,c)
         # see article about delta, 'cause that shit's weird
+    
+
+    for s in lattice:
+        print(s[int(n-8):int(n*4/3)])
 
 
 
-def checkLeft(col,row,table):
+def checkWest(row,col,table):
     left = table[row][col-2]
     down = table[row+1][col-1]
     up = table[row-1][col-1]
@@ -101,7 +194,7 @@ def checkLeft(col,row,table):
             count += 1
         return count
 
-def checkUp(col,row,table):
+def checkNorth(row,col,table):
     left = table[row-1][col-1]
     right = table[row-1][col+1]
     up = table[row-2][col]
@@ -118,7 +211,7 @@ def checkUp(col,row,table):
             count += 1
         return count
 
-def checkRight(col,row,table):
+def checkEast(row,col,table):
     right = table[row][col+2]
     down = table[row+1][col+1]
     up = table[row-1][col+1]
@@ -135,7 +228,7 @@ def checkRight(col,row,table):
             count += 1
         return count
 
-def checkDown(col,row,table):
+def checkSouth(row,col,table):
     left = table[row+1][col-1]
     down = table[row+2][col]
     right = table[row+1][col+1]
