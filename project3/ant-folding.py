@@ -21,7 +21,7 @@ def aco(S='hhppppphhppphppphp'):
     heuristics = [(1.0, 1.0, 1.0)]
     # m_heuristics = [None for _ in range(n)]
     d = {0: 'S', 1: 'L', 2: 'R'}
-    lattice = [[None for _ in range(n*2)] for _ in range(n*2)]
+    lattice = [[None for _ in range(n*3)] for _ in range(n*3)]
     
 
     # TODO: initpos = rnd.randint(0, n - 2)
@@ -37,7 +37,10 @@ def aco(S='hhppppphhppphppphp'):
     prevpos = (n, n)
     currpos = (n, n+1)
 
-    for i in range(initpos, n-1):
+    print('starting pos: %i,%i' % (n, n))
+    print('first direction is relative to nothing, i.e. trivial, going to %i,%i' % (n, n+1))
+
+    for i in range(initpos+1, n-1):
         # print(i)
         pid = []
 
@@ -71,7 +74,7 @@ def aco(S='hhppppphhppphppphp'):
                     h_id = straight(currpos[0], currpos[1], lattice)
                     heuristics_id.append(h_id)
                 except Exception as err:
-                    print('Exception: %s' % err)
+                    print('My Exception: %s' % err)
             elif d == 1:  # Left
                 left = None
                 if current_direction == 'north':
@@ -86,7 +89,7 @@ def aco(S='hhppppphhppphppphp'):
                     h_id = left(currpos[0], currpos[1], lattice)
                     heuristics_id.append(h_id)
                 except Exception as err:
-                    print('Exception: %s' % err)
+                    print('My Exception: %s' % err)
             else: # d == 2,  # Right
                 right = None
                 if current_direction == 'north':
@@ -101,7 +104,7 @@ def aco(S='hhppppphhppphppphp'):
                     h_id = right(currpos[0], currpos[1], lattice)
                     heuristics_id.append(h_id)
                 except Exception as err:
-                    print('Exception: %s' % err)
+                    print('My Exception: %s' % err)
 
         heuristics_id = list(map(lambda x: x + 1, heuristics_id))
         heuristics.append(heuristics_id)
@@ -114,9 +117,19 @@ def aco(S='hhppppphhppphppphp'):
             prob_id = numerator / denom_sum
             pid.append(prob_id)
 
+        print('direction probabilities from here:')
+        print(pid)
+
         # pick an element from {S, L, R} with probabilities as defined by pid
         # directions: S:0, L:1, R:2
         chosen_direction = np.random.choice(3, 1, p=pid)
+
+        if chosen_direction == 0:
+            print('choice: Straight')
+        elif chosen_direction == 1:
+            print('choice: Left')
+        else:
+            print('choice: Right')
 
         # update lattice with new position
         newpos = [currpos[0], currpos[1]]
@@ -162,6 +175,9 @@ def aco(S='hhppppphhppphppphp'):
                 newpos[0] -= 1
         lattice[newpos[0]][newpos[1]] = S[i]
 
+        print('facing %s that leaves us at %i,%i' % (current_direction.upper(), newpos[0], newpos[1]))
+        print()
+
         # update cached positions to perform the move
         prevpos = currpos
         currpos = newpos
@@ -172,8 +188,9 @@ def aco(S='hhppppphhppphppphp'):
         # see article about delta, 'cause that shit's weird
     
 
-    for s in lattice:
-        print(s[int(n-8):int(n*4/3)])
+    print(np.array(lattice))
+    # for s in lattice:
+    #     print(s[int(n-8):int(n*4/3)])
 
 
 
@@ -272,7 +289,7 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    aco()
+    aco('hhhh')
     
 
 if __name__ == '__main__':
