@@ -136,12 +136,14 @@ class HPFold:
                         # print("X", end="")
                     if (i,j+1) in self.grid.keys():
                         l2 = self.grid[i,j+1]
-                        # if self.ContainNeighbors(l1,l2):
+                        if self.ContainNeighbors(l1,l2):
+                            continue
                             # print("-", end="")
-                        if self.ContainHHs(l1, l2):
+                        elif self.ContainHHs(l1, l2):
                             # print("*", end="")
                             score = score + 1
-                        # else:
+                        else:
+                            continue
                             # print(" ", end="")
                     # else:
                         # print(" ", end="")
@@ -154,12 +156,14 @@ class HPFold:
                 if (i,j) in self.grid.keys() and (i+1,j) in self.grid.keys():
                     l1 = self.grid[i,j]
                     l2 = self.grid[i+1,j]
-                    # if self.ContainNeighbors(l1,l2):
+                    if self.ContainNeighbors(l1,l2):
+                        continue
                         # print("|", end="")
-                    if self.ContainHHs(l1,l2):
+                    elif self.ContainHHs(l1,l2):
                         # print("*", end="")
                         score = score + 1
-                    # else:
+                    else:
+                        continue
                         # print(" ", end="")
                 # else:
                     # print(" ", end="")

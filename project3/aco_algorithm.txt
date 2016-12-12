@@ -1,0 +1,21 @@
+1: hhppppphhppphppphp FRRLLRLLRLLRRLLRL 1
+2: hphphhhppphhhhpphh FLLRRLLRLLRLLRRLL 4
+3: phpphphhhphhphhhhh FLRRLRRLRRLLRRLLR 6
+4: hphpphhphpphphhpphph FRRLLRLLRRLLRRLRRLL 4
+
+
+1: hhppppphhppphppphp FLRRLRRLLRRLRLRRL 0
+2: hphphhhppphhhhpphh FRRLLRRLLRLRRLLRR 2
+3: phpphphhhphhphhhhh FRLLRRLLRRLLRRLRR 4
+4: hphpphhphpphphhpphph FRRLLRLLRRLRRLLRRLL 3
+
+
+1: hhppppphhppphppphp FLLRRLRRLRRLLRLLR 1
+2: hphphhhppphhhhpphh FRRLLRRLLRLRRLLRR 2
+3: phpphphhhphhphhhhh FRLLRLLRLLRRLLRRL 6
+4: hphpphhphpphphhpphph FRRLLRLLRRLLRLLRRLR 3
+5: hhhpphphphpphphphpph FLLRRLRRLRRLLRRLRRL 3
+6: hhpphpphpphpphpphpphpphh FRLLRLRRLLRLLRLLRRLLRLR 7
+
+
+7: pphpphhpppphhpppphhpppphh FLLRRLLRRLRRLRRLLRLLRRLL 1

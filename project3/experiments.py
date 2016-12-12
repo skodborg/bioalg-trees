@@ -23,12 +23,13 @@ testData = [
 
 
 def runExperiment():
-	for i, data in enumerate(testData):
+    known_minimal_energy = [4,8,9,9,10,9,8,14,23,21,36,42,53,48,50]
+    for i, data in enumerate(testData):
+        # fold = folding.fold_hp_string(data)
+        fold = ant_folding.aco(data, known_minimal_energy[i])
+        score = ant_folding.score_folding(data, fold)
 
-		fold = folding.fold_hp_string(data)
-		score = ant_folding.score_folding(data, fold)
-
-		print(str(i+1) + ": " + data + " " + fold + " " + str(score))
+        print(str(i+1) + ": " + data + " " + fold + " " + str(score))
 
 def main():
     runExperiment()

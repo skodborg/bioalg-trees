@@ -1,17 +1,24 @@
+import folding
 import hpview3k
 import sys
 import numpy as np
 import random as rnd
 import math
 
-def aco(S='hhppppphhppphppphp'):
-    ants = 10 if len(S) <= 25 else 15
+def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
+    ants = 100 if len(S) <= 25 else 15
     alpha = 1
     beta = 2
-    rho = 0.6  # pheromone evaporation coeff.
+    rho = 0.9  # pheromone evaporation coeff.
     theta = 0.05
     # steps = 100
     n = len(S)
+
+    input_known_minimal_energy = None
+    if known_minimal_energy:
+        input_known_minimal_energy = known_minimal_energy
+    else:
+        input_known_minimal_energy = score_folding(S, folding.fold_hp_string(S))
 
     # initialize pheromones to 1.0 for all i,d as they have no effect on the decision
     # initially (no previous ants have walked, no pheromones has been left, nothing
@@ -29,12 +36,12 @@ def aco(S='hhppppphhppphppphp'):
     ant_trails = []
 
     result = ''
-    iterations = 500
+    iterations = 50
     
     for iteration in range(iterations):
-        if iteration % 1000 == 0:
-            print(iteration)
-        print('new iteration')
+        # if iteration % 1000 == 0:
+        #     print(iteration)
+        # print('new iteration')
         for ant in range(ants):
         # for ant in range(1):
             trail = []
@@ -175,12 +182,12 @@ def aco(S='hhppppphhppphppphp'):
 
                 # pick an element from {S, L, R} with probabilities as defined by pid
                 # directions: S:0, L:1, R:2
-                if ant == 0:
-                    print('ant %i:\t%s' % (ant, str(pid)))
+                # if ant == 0:
+                #     print('ant %i:\t%s' % (ant, str(pid)))
                 chosen_direction = np.random.choice(3, 1, p=pid)
 
-                if ant == 0:
-                    print('chosen direction: %i' % chosen_direction)
+                # if ant == 0:
+                #     print('chosen direction: %i' % chosen_direction)
 
                 if chosen_direction == 0:
                     trail.append('S')
@@ -281,40 +288,68 @@ def aco(S='hhppppphhppphppphp'):
 
             # T(i,d) = (1 - rho) * T(i,d) + delta(i,d,c)
             # see article about delta, 'cause that shit's weird
+
+
+
+        # bias the next iteration by updating the pheromones with
+        # the best path found in this iteration
+        best_trail = None
+        best_trail_score = 0
+        for trail in ant_trails:
+            formatted_trail = 'F' + ''.join(trail).replace('S', 'F')
+            trail_score = score_folding(S, formatted_trail)
+            if not trail_score:
+                trail_score = 0
+            if trail_score > best_trail_score:
+                best_trail = trail
+                best_trail_score = trail_score
+        print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
+
         for i in range(initpos+1, n-1):
 
+            S_count = 1 if best_trail[i-1] == 'S' else 0
+            L_count = 1 if best_trail[i-1] == 'L' else 0
+            R_count = 1 if best_trail[i-1] == 'R' else 0
             # S_count = sum([1 for x in ant_trails if x[i-1] == 'S'])
             # L_count = sum([1 for x in ant_trails if x[i-1] == 'L'])
             # R_count = sum([1 for x in ant_trails if x[i-1] == 'R'])
 
-            input_known_minimal_energy = 4
-            S_count = 0
-            L_count = 0
-            R_count = 0
-            for trail in ant_trails:
-                formatted_trail = 'F' + ''.join(trail).replace('S', 'F')
-                trail_score = score_folding(S, formatted_trail)
-                if formatted_trail[i] == 'S':
-                    S_count += trail_score / input_known_minimal_energy
-                if formatted_trail[i] == 'L':
-                    L_count += trail_score / input_known_minimal_energy
-                if formatted_trail[i] == 'R':
-                    R_count += trail_score / input_known_minimal_energy
+            # S_count = 0
+            # L_count = 0
+            # R_count = 0
+            # for trail in ant_trails:
+            #     formatted_trail = 'F' + ''.join(trail).replace('S', 'F')
+            #     trail_score = score_folding(S, formatted_trail)
+            #     if not trail_score:
+            #         trail_score = 0
+            #     if formatted_trail[i] == 'S':
+            #         S_count += trail_score / input_known_minimal_energy
+            #     if formatted_trail[i] == 'L':
+            #         L_count += trail_score / input_known_minimal_energy
+            #     if formatted_trail[i] == 'R':
+            #         R_count += trail_score / input_known_minimal_energy
             
             pheromones[i][0] = (1 - rho) * pheromones[i][0] + S_count
             pheromones[i][1] = (1 - rho) * pheromones[i][1] + L_count
             pheromones[i][2] = (1 - rho) * pheromones[i][2] + R_count
 
+        # print(pheromones)
+
             # TODO: should pheromones be able to hit 0? I guess so
 
         if iteration == iterations - 1:
             result = ''.join(ant_trails[0]).replace('S', 'F')
+            result = ''.join(best_trail).replace('S', 'F')
             # print(''.join(ant_trails[1]).replace('S', 'F'))
         ant_trails.clear()
 
-    print('pid: %s' % pid)
-    print('pheromones')
-    print(pheromones)
+        # print('pheromones')
+        # print(len(pheromones))
+        # print('best trail')
+        # print(len(best_trail))
+    # print('pid: %s' % pid)
+    # print('pheromones')
+    # print(pheromones)
     return 'F' + result
 
 
@@ -462,13 +497,14 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    # input = 'hhhhhh'
+    # input = 'hhhpphhh'
     input = 'hhppppphhppphppphp'
     
-    result = aco(input)
+    result = aco(input, 4)
     print(result)
     print_folding(input, result)
-    # print_folding(input, 'fllfl')
+    print('score: %i' % score_folding(input, result))
+
 
 
     # result = aco('ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh')
