@@ -174,7 +174,9 @@ class HPFold:
             # print("Score: %d" % (score))
             return score
         else:
-            print("Illegal fold after %d steps" % (self.legal_fold[1]))
+            return 0
+        # else:
+            # print("Illegal fold after %d steps" % (self.legal_fold[1]))
 
 
     def PrintFold (self):

@@ -158,9 +158,9 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
                 deadend_directions = [i for i, x in enumerate(dead_ends) if x]
                 # if deadend_directions:
                 #     print(deadend_directions)
-                if len(deadend_directions) == 3:
+                # if len(deadend_directions) == 3:
                     # TODO: handle all dead ends by backtracking
-                    print('TODO: found a dead end, implement backtracking')
+                    # print('TODO: found a dead end, implement backtracking')
                 if len(deadend_directions) == 2:
                     # print('2 dead ends')
                     # identify non-deadend and make it a 100% choice below by altering pid
@@ -303,7 +303,7 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
             if trail_score > best_trail_score:
                 best_trail = trail
                 best_trail_score = trail_score
-        print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
+        # print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
 
         for i in range(initpos+1, n-1):
 
