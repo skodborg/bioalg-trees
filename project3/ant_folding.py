@@ -22,14 +22,14 @@ def aco(S='hhppppphhppphppphp'):
 
     # m_pheromones = [None for _ in range(n)]
     # heuristics format: (S)traight, (L)eft, (R)ight
-    heuristics = [(1.0, 1.0, 1.0)]
+    # heuristics = [(1.0, 1.0, 1.0)]
     # m_heuristics = [None for _ in range(n)]
     d = {0: 'S', 1: 'L', 2: 'R'}
 
     ant_trails = []
 
     result = ''
-    iterations = 2
+    iterations = 500
     
     for iteration in range(iterations):
         if iteration % 1000 == 0:
@@ -87,6 +87,7 @@ def aco(S='hhppppphhppphppphp'):
                         else: # current_direction == 'west'
                             straight = checkWest
                         try:
+                            # heuristics_id = straight(currpos[0], currpos[1], lattice)
                             h_id = straight(currpos[0], currpos[1], lattice)
                             heuristics_id.append(h_id)
                         except Exception as err:
@@ -104,6 +105,7 @@ def aco(S='hhppppphhppphppphp'):
                         else: # current_direction == 'west'
                             left = checkSouth
                         try:
+                            # heuristics_id = left(currpos[0], currpos[1], lattice)
                             h_id = left(currpos[0], currpos[1], lattice)
                             heuristics_id.append(h_id)
                         except Exception as err:
@@ -121,6 +123,7 @@ def aco(S='hhppppphhppphppphp'):
                         else: # current_direction == 'west'
                             right = checkNorth
                         try:
+                            # heuristics_id = right(currpos[0], currpos[1], lattice)
                             h_id = right(currpos[0], currpos[1], lattice)
                             heuristics_id.append(h_id)
                         except Exception as err:
@@ -128,8 +131,9 @@ def aco(S='hhppppphhppphppphp'):
                             heuristics_id.append(0)
                             # print('My Exception: %s' % err)
 
-                heuristics_id = list(map(lambda x: x + 1, heuristics_id))
-                heuristics.append(heuristics_id)
+                # heuristics_id = list(map(lambda x: x + 1, heuristics_id))
+                # heuristics.append(heuristics_id)
+                heuristics_id = tuple([x+1 for x in heuristics_id])
 
                 # if i == 1 or i == 2:
                 #     print('iteration %i\t\t%s' % (iteration, str(heuristics_id)))
@@ -137,8 +141,10 @@ def aco(S='hhppppphhppphppphp'):
                 for d in range(3):
                     denom_sum = 0.0
                     for e in range(3):
-                        denom_sum += (pheromones[i][e] ** alpha) * (heuristics[i][e] ** beta)
-                    numerator = (pheromones[i][d] ** alpha) * (heuristics[i][d] ** beta)
+                            denom_sum += (pheromones[i][e] ** alpha) * (heuristics_id[e] ** beta)
+                    numerator = (pheromones[i][d] ** alpha) * (heuristics_id[d] ** beta)
+                    #     denom_sum += (pheromones[i][e] ** alpha) * (heuristics[i][e] ** beta)
+                    # numerator = (pheromones[i][d] ** alpha) * (heuristics[i][d] ** beta)
                     prob_id = numerator / denom_sum
                     pid.append(prob_id)
 
@@ -227,9 +233,9 @@ def aco(S='hhppppphhppphppphp'):
                         newpos[0] -= 1
                 lattice[newpos[0]][newpos[1]] = S[i]
 
-                if ant == 0:
-                    print(np.array(lattice[3:10]))
-                    print()
+                # if ant == 0 and iteration == 49:
+                #     print(np.array(lattice[3:10]))
+                #     print()
 
                 # print('facing %s that leaves us at %i,%i' % (current_direction.upper(), newpos[0], newpos[1]))
                 # print()
@@ -277,23 +283,36 @@ def aco(S='hhppppphhppphppphp'):
             # see article about delta, 'cause that shit's weird
         for i in range(initpos+1, n-1):
 
-            S_count = sum([1 for x in ant_trails if x[i-1] == 'S'])
-            L_count = sum([1 for x in ant_trails if x[i-1] == 'L'])
-            R_count = sum([1 for x in ant_trails if x[i-1] == 'R'])
+            # S_count = sum([1 for x in ant_trails if x[i-1] == 'S'])
+            # L_count = sum([1 for x in ant_trails if x[i-1] == 'L'])
+            # R_count = sum([1 for x in ant_trails if x[i-1] == 'R'])
+
+            input_known_minimal_energy = 4
+            S_count = 0
+            L_count = 0
+            R_count = 0
+            for trail in ant_trails:
+                formatted_trail = 'F' + ''.join(trail).replace('S', 'F')
+                trail_score = score_folding(S, formatted_trail)
+                if formatted_trail[i] == 'S':
+                    S_count += trail_score / input_known_minimal_energy
+                if formatted_trail[i] == 'L':
+                    L_count += trail_score / input_known_minimal_energy
+                if formatted_trail[i] == 'R':
+                    R_count += trail_score / input_known_minimal_energy
             
-            pheromones[i][0] = (1 - rho) * S_count
-            pheromones[i][1] = (1 - rho) * L_count
-            pheromones[i][2] = (1 - rho) * R_count
+            pheromones[i][0] = (1 - rho) * pheromones[i][0] + S_count
+            pheromones[i][1] = (1 - rho) * pheromones[i][1] + L_count
+            pheromones[i][2] = (1 - rho) * pheromones[i][2] + R_count
 
             # TODO: should pheromones be able to hit 0? I guess so
 
         if iteration == iterations - 1:
             result = ''.join(ant_trails[0]).replace('S', 'F')
-            print(pid)
             # print(''.join(ant_trails[1]).replace('S', 'F'))
         ant_trails.clear()
 
-
+    print('pid: %s' % pid)
     print('pheromones')
     print(pheromones)
     return 'F' + result
@@ -443,11 +462,13 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    result = aco('hhhhhh')
-    # result = aco()
+    # input = 'hhhhhh'
+    input = 'hhppppphhppphppphp'
+    
+    result = aco(input)
     print(result)
-    print_folding('hhhhhh', result)
-    # print_folding('hhppppphhppphppphp', result)
+    print_folding(input, result)
+    # print_folding(input, 'fllfl')
 
 
     # result = aco('ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh')
