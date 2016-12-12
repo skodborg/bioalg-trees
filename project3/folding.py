@@ -76,7 +76,8 @@ def fold_hp_string(HPstr='hhppppphhppphppphp'):
     final_fold = S1_fold + 's' + S2_fold
     # print(final_fold)
 
-    print_folding(HPstr, final_fold)
+    #print_folding(HPstr, final_fold)
+    return final_fold
 
 
 
