@@ -29,9 +29,12 @@ def aco(S='hhppppphhppphppphp'):
     ant_trails = []
 
     result = ''
-    iterations = 5
+    iterations = 2
     
     for iteration in range(iterations):
+        if iteration % 1000 == 0:
+            print(iteration)
+        print('new iteration')
         for ant in range(ants):
         # for ant in range(1):
             trail = []
@@ -128,6 +131,9 @@ def aco(S='hhppppphhppphppphp'):
                 heuristics_id = list(map(lambda x: x + 1, heuristics_id))
                 heuristics.append(heuristics_id)
 
+                # if i == 1 or i == 2:
+                #     print('iteration %i\t\t%s' % (iteration, str(heuristics_id)))
+
                 for d in range(3):
                     denom_sum = 0.0
                     for e in range(3):
@@ -163,7 +169,12 @@ def aco(S='hhppppphhppphppphp'):
 
                 # pick an element from {S, L, R} with probabilities as defined by pid
                 # directions: S:0, L:1, R:2
+                if ant == 0:
+                    print('ant %i:\t%s' % (ant, str(pid)))
                 chosen_direction = np.random.choice(3, 1, p=pid)
+
+                if ant == 0:
+                    print('chosen direction: %i' % chosen_direction)
 
                 if chosen_direction == 0:
                     trail.append('S')
@@ -216,19 +227,41 @@ def aco(S='hhppppphhppphppphp'):
                         newpos[0] -= 1
                 lattice[newpos[0]][newpos[1]] = S[i]
 
+                if ant == 0:
+                    print(np.array(lattice[3:10]))
+                    print()
+
                 # print('facing %s that leaves us at %i,%i' % (current_direction.upper(), newpos[0], newpos[1]))
                 # print()
 
                 # update cached positions to perform the move
                 prevpos = currpos
                 currpos = newpos
-
                 
             ant_trails.append(tuple(trail))
             # print(np.array(lattice))
             # for s in lattice:
             #     print(s[int(n-8):int(n*4/3)])
         
+
+        # for trail in ant_trails:
+        #     fold = 'F' + ''.join(trail).replace('S', 'F')
+        #     print('%s\t\tscore: %i' % (fold, score_folding(S, fold)))
+
+        # TODO:
+            # pheromone update should depend on the relative success of the ant's tour
+            # i.e. if it found an attractive tour (lots of H-H-pairs), it should influence
+            # the other ants more than the unattractive tours taken by other ants
+            # so the delta term should be affected by the final score of the tour taken
+            # by the particular ant? let it drop pheromone reflecting the score of the tour
+            # going this way
+
+            # need to update christian's script to do this
+
+
+
+
+
 
         # pheromone update:
             # once all ants have taken a path, the pheromones are updated
@@ -358,6 +391,32 @@ def east(row, col):
 def west(row, col):
     return row, col-1
 
+def score_folding(string, fold):
+
+    seq = hpview3k.HPFold(string)
+
+    if len(seq) != len(string):
+        print("The sequence %s contains illegal characters." % (string))
+        sys.exit(1)
+        
+    absfold = hpview3k.make_absfold(fold)
+    relfold = hpview3k.make_relfold(fold)
+
+    if len(absfold) != len(fold) and len(relfold) != len(fold):
+        print("The folding %s contains illegal characters." % (fold))
+        sys.exit(1)
+        
+    if len(absfold) == len(seq) - 1:
+        seq.SetAbsFold(absfold)
+    elif len(relfold) == len(seq) - 1:
+        seq.SetRelFold(relfold)
+    else:
+        print("The folding %s has wrong length." % (fold))
+        sys.exit(1)
+
+    return seq.Score()
+
+
 def print_folding(string, fold):
 
     seq = hpview3k.HPFold(string)
@@ -384,10 +443,24 @@ def print_folding(string, fold):
     seq.PrintFold()
 
 def main():
-    # aco('hhhhhh')
-    result = aco()
+    result = aco('hhhhhh')
+    # result = aco()
     print(result)
-    print_folding('hhppppphhppphppphp', result)
+    print_folding('hhhhhh', result)
+    # print_folding('hhppppphhppphppphp', result)
+
+
+    # result = aco('ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh')
+    # print(result)
+    # print_folding('ppphhpphhhhpphhhphhphhphhhhpppppppphhhhhhpphhhhhhppppppppphphhphhhhhhhhhhhpphhhphhphpphphhhpppppphhh', result)
+
+    # best:
+    # FFRRFFRLRFRRLLRRL: 3
+
+    # worst:
+    # FFLRLFFFRFLFLRFLF
+    # i mean... not even a single fold, nothing is folded up against
+    # anything but its immediate neighbours in the string
 
     
 

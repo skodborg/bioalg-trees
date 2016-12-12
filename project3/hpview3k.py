@@ -123,7 +123,56 @@ class HPFold:
                 if (self.seq[k1] == "h" or self.seq[k1] == "H") and (self.seq[k2] == "h" or self.seq[k2] == "H"):
                     res = True
         return res
-        
+
+    def Score(self):
+        score = 0
+        for i in range(self.min_i, self.max_i+1):
+            for j in range(self.min_j, self.max_j+1):
+                if (i,j) in self.grid.keys():
+                    l1 = self.grid[i,j]
+                    # if len(l1) == 1:
+                        # print(self.seq[l1[0]], end="")
+                    # else:
+                        # print("X", end="")
+                    if (i,j+1) in self.grid.keys():
+                        l2 = self.grid[i,j+1]
+                        # if self.ContainNeighbors(l1,l2):
+                            # print("-", end="")
+                        if self.ContainHHs(l1, l2):
+                            # print("*", end="")
+                            score = score + 1
+                        # else:
+                            # print(" ", end="")
+                    # else:
+                        # print(" ", end="")
+                # else:
+                    # print(".", end="")
+                    # print(" ", end="")
+            # print()
+
+            for j in range(self.min_j, self.max_j+1):
+                if (i,j) in self.grid.keys() and (i+1,j) in self.grid.keys():
+                    l1 = self.grid[i,j]
+                    l2 = self.grid[i+1,j]
+                    # if self.ContainNeighbors(l1,l2):
+                        # print("|", end="")
+                    if self.ContainHHs(l1,l2):
+                        # print("*", end="")
+                        score = score + 1
+                    # else:
+                        # print(" ", end="")
+                # else:
+                    # print(" ", end="")
+                # print(" ", end="")
+            # print()
+
+        if self.legal_fold[0]:
+            # print("Score: %d" % (score))
+            return score
+        else:
+            print("Illegal fold after %d steps" % (self.legal_fold[1]))
+
+
     def PrintFold (self):
         """
         Print fold and output its score
@@ -172,6 +221,7 @@ class HPFold:
 
         if self.legal_fold[0]:
             print("Score: %d" % (score))
+            return score
         else:
             print("Illegal fold after %d steps" % (self.legal_fold[1]))
 
