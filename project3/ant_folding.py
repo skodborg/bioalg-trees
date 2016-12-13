@@ -6,10 +6,10 @@ import random as rnd
 import math
 
 def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
-    ants = 100 if len(S) <= 25 else 15
+    ants = 100 if len(S) <= 25 else 150
     alpha = 1
     beta = 2
-    rho = 0.9  # pheromone evaporation coeff.
+    rho = 0.6  # pheromone evaporation coeff.
     theta = 0.05
     # steps = 100
     n = len(S)
@@ -36,7 +36,7 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
     ant_trails = []
 
     result = ''
-    iterations = 50
+    iterations = 500
     
     for iteration in range(iterations):
         # if iteration % 1000 == 0:
@@ -155,6 +155,17 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
                     prob_id = numerator / denom_sum
                     pid.append(prob_id)
 
+                # do not allow any possibility to dip below a probability threshold
+                probability_lowerlimit = 0.10
+                for i, p in enumerate(pid):
+                    if p < probability_lowerlimit:
+                        # grab the remainder up to 0.05 from the highest probability
+                        diff = probability_lowerlimit - p
+                        highest_prob = max(set(pid) - set([pid[i]]))
+                        highest_prob_idx = pid.index(highest_prob)
+                        pid[i] = probability_lowerlimit
+                        pid[highest_prob_idx] -= diff
+
                 deadend_directions = [i for i, x in enumerate(dead_ends) if x]
                 # if deadend_directions:
                 #     print(deadend_directions)
@@ -184,6 +195,9 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
                 # directions: S:0, L:1, R:2
                 # if ant == 0:
                 #     print('ant %i:\t%s' % (ant, str(pid)))
+
+
+
                 chosen_direction = np.random.choice(3, 1, p=pid)
 
                 # if ant == 0:
@@ -303,7 +317,13 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
             if trail_score > best_trail_score:
                 best_trail = trail
                 best_trail_score = trail_score
-        # print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
+        if iteration % 100 == 0:
+            print('iteration %i' % iteration)
+            print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
+
+        if known_minimal_energy:
+            if best_trail_score == known_minimal_energy:
+                return 'F' + ''.join(trail).replace('S', 'F')
 
         for i in range(initpos+1, n-1):
 
@@ -338,7 +358,7 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
             # TODO: should pheromones be able to hit 0? I guess so
 
         if iteration == iterations - 1:
-            result = ''.join(ant_trails[0]).replace('S', 'F')
+            # result = ''.join(ant_trails[0]).replace('S', 'F')
             result = ''.join(best_trail).replace('S', 'F')
             # print(''.join(ant_trails[1]).replace('S', 'F'))
         ant_trails.clear()
