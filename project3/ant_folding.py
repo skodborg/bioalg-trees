@@ -36,7 +36,7 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
     ant_trails = []
 
     result = ''
-    iterations = 500
+    iterations = 50
     
     for iteration in range(iterations):
         # if iteration % 1000 == 0:
@@ -317,7 +317,7 @@ def aco(S='hhppppphhppphppphp', known_minimal_energy=None):
             if trail_score > best_trail_score:
                 best_trail = trail
                 best_trail_score = trail_score
-        if iteration % 100 == 0:
+        if iteration+1 % 100 == 0:
             print('iteration %i' % iteration)
             print('best trail: %i \t %s' % (best_trail_score, 'F' + ''.join(best_trail).replace('S', 'F')))
 
@@ -520,10 +520,10 @@ def main():
     # input = 'hhhpphhh'
     input = 'hhppppphhppphppphp'
     
-    result = aco(input, 4)
+    result = aco(input)
     print(result)
     print_folding(input, result)
-    print('score: %i' % score_folding(input, result))
+    # print('score: %i' % score_folding(input, result))
 
 
 
